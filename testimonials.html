@@ -164,6 +164,42 @@
   </footer>
 
   <script src="js/main.js"></script>
+<script>
+(function(){
+  var slug = 'aaronriddletattoos';
+  fetch('https://curious-lemming-262.convex.site/api/testimonials/approved?slug=' + slug)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var reviews = data.testimonials || [];
+      if(!reviews.length) return;
+      var ph = document.getElementById('placeholder-block');
+      if(ph) ph.style.display = 'none';
+      var grid = document.getElementById('reviews-grid');
+      if(!grid) {
+        grid = document.createElement('div');
+        grid.id = 'reviews-grid';
+        grid.className = 'reviews-grid';
+        var body = document.querySelector('.testimonials-body') || document.querySelector('.reviews-body');
+        if(body) body.insertBefore(grid, body.firstChild);
+        else return;
+      }
+      reviews.forEach(function(r){
+        var stars = '';
+        for(var i=0;i<(r.rating||5);i++) stars += '★ ';
+        var d = new Date(r.createdAt);
+        var dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        var card = document.createElement('div');
+        card.className = 'review-card fade-up visible';
+        card.innerHTML = '<div class="review-stars">'+stars+'</div>'
+          + '<p class="review-text">"'+r.reviewText.replace(/</g,'&lt;')+'"</p>'
+          + '<p class="review-author">— '+r.name.replace(/</g,'&lt;')+'</p>'
+          + '<p class="review-date">'+dateStr+'</p>';
+        grid.appendChild(card);
+      });
+    })
+    .catch(function(){});
+})();
+</script>
 </body>
 </html>
 
