@@ -44,7 +44,7 @@
       <div class="booking-grid">
         <!-- Form -->
         <div class="fade-up">
-          <form action="https://formspree.io/f/placeholder" method="POST">
+          <form onsubmit="handleBooking(event)">
             <div class="form-group">
               <label for="name">Full Name</label>
               <input type="text" id="name" name="name" required placeholder="Your name">
@@ -103,6 +103,36 @@
             </div>
             <button type="submit" class="btn" style="width: 100%; text-align: center;">Submit Request</button>
           </form>
+          <script>
+          async function handleBooking(e) {
+            e.preventDefault();
+            var btn = e.target.querySelector('button[type="submit"]');
+            var origText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            try {
+              var name = document.getElementById('name').value.trim();
+              var email = document.getElementById('email').value.trim();
+              var phone = (document.getElementById('phone') || {}).value || '';
+              var service = (document.getElementById('style') || {}).value || '';
+              var message = document.getElementById('description').value.trim();
+              if (!name || !email || !message) { alert('Please fill in all required fields.'); btn.disabled = false; btn.textContent = origText; return; }
+              var res = await fetch('https://curious-lemming-262.convex.site/api/booking/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ slug: 'aaronriddletattoos', name: name, email: email, phone: phone || undefined, service: service || undefined, message: message })
+              });
+              if (!res.ok) throw new Error('Network error');
+              e.target.reset();
+              btn.textContent = '\u2713 Sent!';
+              setTimeout(function() { btn.textContent = origText; btn.disabled = false; }, 3000);
+            } catch(err) {
+              alert('Something went wrong. Please try again.');
+              btn.textContent = origText;
+              btn.disabled = false;
+            }
+          }
+          </script>
         </div>
 
         <!-- Info sidebar -->
@@ -156,3 +186,4 @@
   <script src="js/main.js"></script>
 </body>
 </html>
+
